@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick Sort MCQ</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .question-block { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
+    .question { margin-bottom: 10px; }
+    .choices { margin-bottom: 10px; }
+    .result { font-weight: bold; margin-top: 10px; }
+    .justification { margin-top: 5px; display: none; }
+    .pagination { text-align: center; margin-top: 20px; }
+    .pagination button { margin: 0 10px; padding: 5px 15px; }
+  </style>
+</head>
+<body>
+  <div id="quiz-container"></div>
+  <div class="pagination">
+    <button onclick="prevPage()">Previous</button>
+    <span id="page-indicator"></span>
+    <button onclick="nextPage()">Next</button>
+  </div>
+
+  
+<script>
+  const questionsPerPage = 10;
+  let allQuestions = [];
+  let currentPage = 1;
+
+async function loadAllQuestions() {
+  let index = 1;
+  while (true) {
+    try {
+      const module = await import(`./q${index}.js`);
+      console.log(`Loaded q${index}.js`);
+      allQuestions.push(...module.default);
+      index++;
+    } catch (e) {
+      console.log(`Stopped loading at q${index}.js`, e.message);
+      break;
+    }
+  }
+  renderPage();
+}
+
+  function renderPage() {
+    const container = document.getElementById("quiz-container");
+    container.innerHTML = "";
+
+    const start = (currentPage - 1) * questionsPerPage;
+    const end = start + questionsPerPage;
+    const pageQuestions = allQuestions.slice(start, end);
+
+    pageQuestions.forEach((data, index) => {
+      const qNum = start + index + 1;
+      const resultId = `result-${qNum}`;
+      const justId = `just-${qNum}`;
+
+      const block = document.createElement("div");
+      block.className = "question-block";
+      block.innerHTML = `
+        <div class="question">
+          <strong>Q${qNum}:</strong> ${data.question}
+          ${data.code ? `<pre><code>${data.code}</code></pre>` : ""}
+        </div>
+        <div class="choices">
+          ${data.choices.map((choice, idx) => `
+            <label>
+              <input type="radio" name="choice-${qNum}" value="${idx}" onclick="checkAnswer(${idx}, ${data.correct}, '${data.justification.replace(/'/g, "\\'")}', '${resultId}', '${justId}')">
+              ${choice}
+            </label><br>`).join('')}
+        </div>
+        <div class="result" id="${resultId}"></div>
+        <div class="justification" id="${justId}"></div>
+      `;
+      container.appendChild(block);
+    });
+
+    document.getElementById("page-indicator").textContent = `Page ${currentPage} of ${Math.ceil(allQuestions.length / questionsPerPage)}`;
+  }
+
+  function checkAnswer(selected, correct, justification, resultId, justId) {
+    const result = document.getElementById(resultId);
+    const just = document.getElementById(justId);
+    if (selected === correct) {
+      result.textContent = 'Correct!';
+      result.style.color = 'green';
+    } else {
+      result.textContent = 'Wrong!';
+      result.style.color = 'red';
+    }
+    just.textContent = 'Justification: ' + justification;
+    just.style.display = 'block';
+  }
+
+  function prevPage() {
+    if (currentPage > 1) {
+      currentPage--;
+      renderPage();
+    }
+  }
+
+  function nextPage() {
+    const maxPage = Math.ceil(allQuestions.length / questionsPerPage);
+    if (currentPage < maxPage) {
+      currentPage++;
+      renderPage();
+    }
+  }
+
+  window.onload = () => {
+  loadAllQuestions();
+};
+</script>
+</body>
+</html>
