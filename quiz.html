@@ -155,19 +155,26 @@
       padding: 10px 15px;
       background-color: #f8f8f8;
       border-radius: 4px;
+    }    .shuffle-options {
+      display: flex;
+      gap: 20px;
     }
-    .shuffle-btn {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 4px;
+    .shuffle-options label {
       cursor: pointer;
-      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background-color: #f0f4f9;
+      padding: 5px 10px;
+      border-radius: 4px;
       transition: background-color 0.2s;
     }
-    .shuffle-btn:hover {
-      background-color: #45a049;
+    .shuffle-options label:hover {
+      background-color: #e3e9f0;
+    }
+    .shuffle-options input[type="checkbox"] {
+      margin: 0;
+      cursor: pointer;
     }
     footer {
       text-align: center;
@@ -186,11 +193,20 @@
       <a href="index.html" class="back-btn">Back to Categories</a>
     </div>
     
-    <div class="options-bar">
+  <div class="options-bar">
       <div>
         <span id="question-count"></span> questions loaded
       </div>
-      <button class="shuffle-btn" onclick="toggleShuffle()">Shuffle Questions</button>
+      <div class="shuffle-options">
+        <label>
+          <input type="checkbox" id="shuffle-questions-checkbox" onchange="toggleQuestionShuffle(this.checked)">
+          Shuffle Questions
+        </label>
+        <label>
+          <input type="checkbox" id="shuffle-answers-checkbox" onchange="toggleAnswerShuffle(this.checked)">
+          Shuffle Answers
+        </label>
+      </div>
     </div>
     
     <div id="quiz-container"></div>
@@ -206,16 +222,18 @@
   </div>
 
   <script src="js/utils.js"></script>
-  <script>
-  const questionsPerPage = 10;
+  <script>  const questionsPerPage = 10;
   let allQuestions = [];
   let currentPage = 1;
-  let shuffleMode = false;
+  let shuffleQuestionsMode = false;
+  let shuffleAnswersMode = false;
+  let originalChoices = []; // Store original answer choices
   
-  // Get the category parameter from URL
+  // Get the URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const category = urlParams.get('q');
-  const initialShuffle = urlParams.get('shuffle') === 'true';
+  const initialQuestionShuffle = urlParams.get('shuffleQuestions') === 'true';
+  const initialAnswerShuffle = urlParams.get('shuffleAnswers') === 'true';
   
   // Set title and category badge
   document.title = `Quiz Zone - ${category ? category.toUpperCase() : 'All Quizzes'}`;
@@ -264,11 +282,15 @@
     } catch (e) {
       console.error('Error retrieving category info:', e);
     }
+      // Initialize checkboxes based on URL parameters
+    if (initialQuestionShuffle) {
+      shuffleQuestionsMode = true;
+      document.getElementById('shuffle-questions-checkbox').checked = true;
+    }
     
-    // Initialize shuffle if needed
-    if (initialShuffle) {
-      shuffleMode = true;
-      document.querySelector('.shuffle-btn').textContent = 'Ordered Questions';
+    if (initialAnswerShuffle) {
+      shuffleAnswersMode = true;
+      document.getElementById('shuffle-answers-checkbox').checked = true;
     }
   });
 
@@ -291,10 +313,17 @@
         break;
       }
     }
+      // Store original answer choices for each question
+    originalChoices = allQuestions.map(question => [...question.choices]);
     
-    // Apply initial shuffle if needed
-    if (initialShuffle) {
+    // Apply initial question shuffle if needed
+    if (initialQuestionShuffle) {
       shuffleArray(allQuestions);
+    }
+    
+    // Apply initial answer shuffle if needed
+    if (initialAnswerShuffle) {
+      shuffleAllAnswers();
     }
     
     // Update question count
@@ -302,24 +331,82 @@
     
     renderPage();
   }
-
-  function toggleShuffle() {
-    shuffleMode = !shuffleMode;
-    const shuffleBtn = document.querySelector('.shuffle-btn');
+  function toggleQuestionShuffle(isChecked) {
+    shuffleQuestionsMode = isChecked;
     
-    if (shuffleMode) {
-      shuffleBtn.textContent = 'Ordered Questions';
+    if (isChecked) {
       shuffleArray(allQuestions);
       showNotification("Questions shuffled", "success");
     } else {
-      shuffleBtn.textContent = 'Shuffle Questions';
-      // Reset to original order by reloading
-      window.location.href = `quiz.html?q=${category}`;
+      // Reset to original order by reloading with updated parameters
+      updateUrlAndReload();
       return;
     }
     
     currentPage = 1;
     renderPage();
+  }
+  
+  function toggleAnswerShuffle(isChecked) {
+    shuffleAnswersMode = isChecked;
+    
+    if (isChecked) {
+      shuffleAllAnswers();
+      showNotification("Answer choices shuffled", "success");
+    } else {
+      // Restore original answer choices
+      restoreOriginalAnswers();
+      showNotification("Original answer order restored", "info");
+    }
+    
+    renderPage();
+  }
+  
+  function updateUrlAndReload() {
+    const newUrl = new URL(window.location.href);
+    const params = new URLSearchParams(newUrl.search);
+    
+    // Update parameters
+    params.set('q', category);
+    params.set('shuffleQuestions', shuffleQuestionsMode);
+    params.set('shuffleAnswers', shuffleAnswersMode);
+    
+    newUrl.search = params.toString();
+    window.location.href = newUrl.toString();
+  }
+  
+  function shuffleAllAnswers() {
+    allQuestions.forEach((question, index) => {
+      // Create an array of {choice, isCorrect} to track the correct answer
+      const choicesWithCorrect = question.choices.map((choice, idx) => ({
+        choice: choice,
+        isCorrect: idx === question.correct
+      }));
+      
+      // Shuffle the array
+      shuffleArray(choicesWithCorrect);
+      
+      // Update the question with shuffled choices
+      question.choices = choicesWithCorrect.map(item => item.choice);
+      
+      // Update the correct answer index
+      question.correct = choicesWithCorrect.findIndex(item => item.isCorrect);
+    });
+  }
+  
+  function restoreOriginalAnswers() {
+    allQuestions.forEach((question, index) => {
+      if (index < originalChoices.length) {
+        // Find current correct answer text
+        const correctAnswerText = question.choices[question.correct];
+        
+        // Restore original choices
+        question.choices = [...originalChoices[index]];
+        
+        // Find new correct answer index
+        question.correct = question.choices.findIndex(choice => choice === correctAnswerText);
+      }
+    });
   }
 
   function renderPage() {
@@ -393,9 +480,17 @@
       window.scrollTo(0, 0);
     }
   }
-
   // Load questions when page loads
   window.addEventListener('DOMContentLoaded', loadAllQuestions);
+  
+  // Add event listener for beforeunload to update URL parameters when navigating away
+  window.addEventListener('beforeunload', function() {
+    // Store current preferences in session storage for potential use later
+    sessionStorage.setItem('shufflePreferences', JSON.stringify({
+      shuffleQuestions: shuffleQuestionsMode,
+      shuffleAnswers: shuffleAnswersMode
+    }));
+  });
   </script>
 </body>
 </html>
