@@ -206,10 +206,10 @@
       {
         id: 'dbms',
         name: 'Database Management Systems',
-        semester: '5th Semester',
+        semester: '4th Semester',
         subject: {
           name: 'DBMS',
-          code: 'CS301'
+          code: 'IN2401'
         },
         quizCount: 25,
         folder: 'categories/dbms'
@@ -217,10 +217,10 @@
       {
         id: 'dsa',
         name: 'Data Structures and Algorithms',
-        semester: '3rd Semester',
+        semester: '4rd Semester',
         subject: {
-          name: 'DSA',
-          code: 'CS201'
+          name: 'DSA2',
+          code: 'IN2111'
         },
         quizCount: 5,
         folder: 'categories/dsa'
@@ -244,11 +244,21 @@
       
       quizCategories.forEach(category => {
         const card = document.createElement('div');
-        card.className = 'card';
-        card.onclick = () => {
+        card.className = 'card';        card.onclick = () => {
           // Store category information in session storage for the quiz page to use
           sessionStorage.setItem('categoryInfo', JSON.stringify(category));
-          window.location.href = `quiz.html?q=${category.id}`;
+          
+          // Get shuffle preferences
+          const shuffleQuestions = document.getElementById('shuffle-questions-checkbox').checked;
+          const shuffleAnswers = document.getElementById('shuffle-answers-checkbox').checked;
+          
+          // Create URL with parameters
+          const url = new URL('quiz.html', window.location.href);
+          url.searchParams.set('q', category.id);
+          url.searchParams.set('shuffleQuestions', shuffleQuestions);
+          url.searchParams.set('shuffleAnswers', shuffleAnswers);
+          
+          window.location.href = url.toString();
         };
         
         card.innerHTML = `

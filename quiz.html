@@ -90,14 +90,24 @@
       padding: 10px;
       border-radius: 4px;
       line-height: 1.4;
-    }
-    .pagination { 
+    }    .pagination { 
       text-align: center; 
-      margin-top: 30px; 
       display: flex;
       justify-content: center;
       align-items: center;
+      margin: 20px 0;
     }
+    
+    .pagination-top {
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #e0e0e0;
+    }
+    
+    .pagination-bottom {
+      margin-top: 30px;
+    }
+    
     .pagination button { 
       margin: 0 10px; 
       padding: 10px 20px;
@@ -109,14 +119,17 @@
       font-weight: bold;
       transition: background-color 0.2s;
     }
+    
     .pagination button:hover {
       background-color: #3a5995;
     }
+    
     .pagination button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
-    #page-indicator {
+    
+    .page-indicator {
       margin: 0 15px;
       font-weight: bold;
     }
@@ -192,8 +205,7 @@
       <h1>Quiz Zone <span id="category-badge" class="category-badge">Category</span></h1>
       <a href="index.html" class="back-btn">Back to Categories</a>
     </div>
-    
-  <div class="options-bar">
+    <div class="options-bar">
       <div>
         <span id="question-count"></span> questions loaded
       </div>
@@ -208,12 +220,17 @@
         </label>
       </div>
     </div>
+
+    <div class="pagination pagination-top">
+      <button class="prev-btn" onclick="prevPage()">Previous</button>
+      <span class="page-indicator"></span>
+      <button class="next-btn" onclick="nextPage()">Next</button>
+    </div>
     
-    <div id="quiz-container"></div>
-    <div class="pagination">
-      <button id="prev-btn" onclick="prevPage()">Previous</button>
-      <span id="page-indicator"></span>
-      <button id="next-btn" onclick="nextPage()">Next</button>
+    <div id="quiz-container"></div>    <div class="pagination pagination-bottom">
+      <button class="prev-btn" onclick="prevPage()">Previous</button>
+      <span class="page-indicator"></span>
+      <button class="next-btn" onclick="nextPage()">Next</button>
     </div>
     
     <footer>
@@ -440,14 +457,24 @@
         <div class="justification" id="${justId}"></div>
       `;
       container.appendChild(block);
-    });
-
-    // Update page indicator and button states
+    });    // Update page indicators and button states
     const totalPages = Math.ceil(allQuestions.length / questionsPerPage);
-    document.getElementById("page-indicator").textContent = `Page ${currentPage} of ${totalPages}`;
+    const pageText = `Page ${currentPage} of ${totalPages}`;
     
-    document.getElementById("prev-btn").disabled = currentPage === 1;
-    document.getElementById("next-btn").disabled = currentPage === totalPages;
+    // Update all page indicators
+    document.querySelectorAll(".page-indicator").forEach(indicator => {
+      indicator.textContent = pageText;
+    });
+    
+    // Disable/enable all previous buttons
+    document.querySelectorAll(".prev-btn").forEach(button => {
+      button.disabled = currentPage === 1;
+    });
+    
+    // Disable/enable all next buttons
+    document.querySelectorAll(".next-btn").forEach(button => {
+      button.disabled = currentPage === totalPages;
+    });
   }
 
   function checkAnswer(selected, correct, justification, resultId, justId) {
@@ -463,12 +490,12 @@
     just.textContent = 'Justification: ' + justification;
     just.style.display = 'block';
   }
-
   function prevPage() {
     if (currentPage > 1) {
       currentPage--;
       renderPage();
-      window.scrollTo(0, 0);
+      // Smooth scroll to the top of the quiz container
+      document.getElementById('quiz-container').scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -477,7 +504,8 @@
     if (currentPage < maxPage) {
       currentPage++;
       renderPage();
-      window.scrollTo(0, 0);
+      // Smooth scroll to the top of the quiz container
+      document.getElementById('quiz-container').scrollIntoView({ behavior: 'smooth' });
     }
   }
   // Load questions when page loads
