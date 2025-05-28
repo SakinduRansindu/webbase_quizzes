@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Sample Questions - Quiz System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn-secondary {
+            background: #2196F3;
+        }
+        .btn-secondary:hover {
+            background: #1976D2;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .current-keys {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .key-list {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Quiz System Setup</h1>
+        <p>This page will add sample questions to your browser's localStorage so you can test the local quiz functionality.</p>
+        
+        <div class="info">
+            <h3>What will be added:</h3>
+            <ul>
+                <li><strong>q1:</strong> JavaScript Basics (3 questions)</li>
+                <li><strong>q2:</strong> HTML Basics (3 questions)</li>
+                <li><strong>q3:</strong> CSS Basics (3 questions)</li>
+            </ul>
+        </div>
+
+        <div class="current-keys">
+            <h3>Current localStorage Quiz Keys:</h3>
+            <div class="key-list" id="currentKeys">Loading...</div>
+        </div>
+
+        <button class="btn" onclick="addSampleQuestions()">Add Sample Questions</button>
+        <button class="btn btn-secondary" onclick="clearAllQuestions()">Clear All Questions</button>
+        
+        <div class="status" id="status"></div>
+        
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+            <a href="quiz.html" class="btn">Take Local Quiz</a>
+            <a href="manage.html" class="btn btn-secondary">Manage Questions</a>
+        </div>
+    </div>
+
+    <script>
+        // Sample questions data
+        const sampleQuestions = [
+            // Q1 - JavaScript Basics
+            [
+                {
+                    question: "What is the correct way to declare a variable in JavaScript?",
+                    code: "",
+                    choices: [
+                        "variable x = 5;",
+                        "var x = 5;",
+                        "declare x = 5;",
+                        "x := 5;"
+                    ],
+                    correct: 1,
+                    justification: "The 'var' keyword is used to declare variables in JavaScript."
+                },
+                {
+                    question: "Which of the following is NOT a JavaScript data type?",
+                    code: "",
+                    choices: [
+                        "String",
+                        "Boolean",
+                        "Integer",
+                        "Number"
+                    ],
+                    correct: 2,
+                    justification: "JavaScript doesn't have a separate 'Integer' type. It only has 'Number' which can represent both integers and floating-point numbers."
+                },
+                {
+                    question: "What does the '===' operator do in JavaScript?",
+                    code: "",
+                    choices: [
+                        "Assigns a value",
+                        "Compares values only",
+                        "Compares values and types",
+                        "Performs arithmetic addition"
+                    ],
+                    correct: 2,
+                    justification: "The '===' operator performs strict equality comparison, checking both value and type."
+                }
+            ],
+            
+            // Q2 - HTML Basics
+            [
+                {
+                    question: "Which HTML tag is used to create a hyperlink?",
+                    code: "",
+                    choices: [
+                        "<link>",
+                        "<href>",
+                        "<a>",
+                        "<url>"
+                    ],
+                    correct: 2,
+                    justification: "The <a> (anchor) tag is used to create hyperlinks in HTML."
+                },
+                {
+                    question: "What is the correct HTML syntax for creating a comment?",
+                    code: "",
+                    choices: [
+                        "// This is a comment",
+                        "/* This is a comment */",
+                        "<!-- This is a comment -->",
+                        "# This is a comment"
+                    ],
+                    correct: 2,
+                    justification: "HTML comments are written using <!-- comment --> syntax."
+                },
+                {
+                    question: "Which attribute specifies the destination of a hyperlink?",
+                    code: "",
+                    choices: [
+                        "src",
+                        "href",
+                        "link",
+                        "url"
+                    ],
+                    correct: 1,
+                    justification: "The 'href' attribute specifies the URL of the page the link goes to."
+                }
+            ],
+            
+            // Q3 - CSS Basics
+            [
+                {
+                    question: "Which CSS property is used to change the text color?",
+                    code: "",
+                    choices: [
+                        "text-color",
+                        "font-color",
+                        "color",
+                        "text-style"
+                    ],
+                    correct: 2,
+                    justification: "The 'color' property is used to set the color of text in CSS."
+                },
+                {
+                    question: "How do you select an element with id 'myElement' in CSS?",
+                    code: "",
+                    choices: [
+                        ".myElement",
+                        "#myElement",
+                        "*myElement",
+                        "myElement"
+                    ],
+                    correct: 1,
+                    justification: "The '#' symbol is used to select elements by their ID in CSS."
+                },
+                {
+                    question: "Which CSS property controls the spacing between lines of text?",
+                    code: "",
+                    choices: [
+                        "line-spacing",
+                        "text-spacing",
+                        "line-height",
+                        "vertical-spacing"
+                    ],
+                    correct: 2,
+                    justification: "The 'line-height' property controls the amount of space between lines of text."
+                }
+            ]
+        ];
+
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${isError ? 'error' : 'success'}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateCurrentKeys() {
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('q')).sort();
+            const currentKeysDiv = document.getElementById('currentKeys');
+            
+            if (keys.length === 0) {
+                currentKeysDiv.textContent = 'No quiz questions found in localStorage';
+            } else {
+                currentKeysDiv.innerHTML = keys.map(key => {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        const count = Array.isArray(data) ? data.length : 'Invalid format';
+                        return `${key}: ${count} questions`;
+                    } catch (e) {
+                        return `${key}: Invalid JSON`;
+                    }
+                }).join('<br>');
+            }
+        }
+
+        function addSampleQuestions() {
+            try {
+                sampleQuestions.forEach((questions, index) => {
+                    const key = `q${index + 1}`;
+                    localStorage.setItem(key, JSON.stringify(questions));
+                });
+                
+                showStatus(`✅ Sample questions added successfully! Added keys: q1, q2, q3`);
+                updateCurrentKeys();
+                
+            } catch (error) {
+                console.error('Error adding sample questions:', error);
+                showStatus(`❌ Error adding sample questions: ${error.message}`, true);
+            }
+        }
+
+        function clearAllQuestions() {
+            if (confirm('Are you sure you want to clear all quiz questions from localStorage?\n\nThis action cannot be undone.')) {
+                const keys = Object.keys(localStorage).filter(key => key.startsWith('q'));
+                keys.forEach(key => localStorage.removeItem(key));
+                
+                showStatus(`🗑️ Cleared ${keys.length} quiz question sets`);
+                updateCurrentKeys();
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', updateCurrentKeys);
+    </script>
+</body>
+</html>

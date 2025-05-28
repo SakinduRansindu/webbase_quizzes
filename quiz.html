@@ -310,11 +310,10 @@
       document.getElementById('shuffle-answers-checkbox').checked = true;
     }
   });
-
   async function loadAllQuestions() {
     if (!category) {
-      showNotification("No category specified! Redirecting to categories page.", "error");
-      setTimeout(() => window.location.href = "index.html", 2000);
+      // Load from local storage when no category is specified
+      loadQuestionsFromLocalStorage();
       return;
     }
       let index = 1;
@@ -345,6 +344,64 @@
     
     // Update question count
     document.getElementById('question-count').textContent = allQuestions.length;
+    
+    renderPage();
+  }
+  
+  function loadQuestionsFromLocalStorage() {
+    allQuestions = [];
+    let index = 1;
+    
+    // Load questions from local storage with keys q1, q2, q3, etc.
+    while (true) {
+      const key = `q${index}`;
+      const questionsData = localStorage.getItem(key);
+      
+      if (!questionsData) {
+        break; // No more questions found
+      }
+      
+      try {
+        const questions = JSON.parse(questionsData).questions;
+        if (Array.isArray(questions)) {
+          allQuestions.push(...questions);
+          console.log(`Loaded ${questions.length} questions from localStorage key: ${key}`);
+        }
+      } catch (e) {
+        console.error(`Error parsing questions from localStorage key ${key}:`, e);
+      }
+      
+      index++;
+    }
+    
+    if (allQuestions.length === 0) {
+      showNotification("No questions found in local storage! Please add some questions first.", "warning");
+      setTimeout(() => window.location.href = "manage.html", 2000);
+      return;
+    }
+    
+    // Store original answer choices for each question
+    originalChoices = allQuestions.map(question => [...question.choices]);
+    
+    // Apply initial question shuffle if needed
+    if (initialQuestionShuffle) {
+      shuffleArray(allQuestions);
+    }
+    
+    // Apply initial answer shuffle if needed
+    if (initialAnswerShuffle) {
+      shuffleAllAnswers();
+    }
+    
+    // Update question count
+    document.getElementById('question-count').textContent = allQuestions.length;
+    
+    // Update page title and badge
+    document.title = 'Quiz Zone - Local Storage';
+    const categoryBadge = document.getElementById('category-badge');
+    if (categoryBadge) {
+      categoryBadge.textContent = 'Local Storage';
+    }
     
     renderPage();
   }
@@ -384,7 +441,9 @@
     const params = new URLSearchParams(newUrl.search);
     
     // Update parameters
+    if(category){
     params.set('q', category);
+    }
     params.set('shuffleQuestions', shuffleQuestionsMode);
     params.set('shuffleAnswers', shuffleAnswersMode);
     

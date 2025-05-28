@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Zone - Manage Questions</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      color: #333;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #666;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+    
+    .header-divider {
+      width: 100px;
+      height: 3px;
+      background-color: #4a6eb5;
+      margin: 0 auto 20px auto;
+    }
+    
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      background-color: #4a6eb5;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+    
+    .btn:hover {
+      background-color: #3a5995;
+    }
+    
+    .btn-success {
+      background-color: #28a745;
+    }
+    
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    
+    .btn-danger {
+      background-color: #dc3545;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+    
+    .quiz-list {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .quiz-item {
+      border-bottom: 1px solid #eee;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+    
+    .quiz-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .quiz-item:last-child {
+      border-bottom: none;
+    }
+    
+    .quiz-info {
+      flex: 1;
+    }
+    
+    .quiz-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .quiz-meta {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .quiz-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .modal-header {
+      background-color: #4a6eb5;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    
+    .close {
+      color: white;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+    }
+    
+    .close:hover {
+      opacity: 0.7;
+    }
+    
+    .modal-body {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    
+    .form-textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    
+    .modal-footer {
+      padding: 15px 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .btn-secondary {
+      background-color: #6c757d;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    .error-message {
+      color: #dc3545;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .quiz-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .quiz-actions {
+        align-self: stretch;
+        justify-content: flex-end;
+      }
+      
+      .modal-content {
+        width: 95%;
+        margin: 2% auto;
+        max-height: 95vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Quiz Zone</h1>
+      <p class="subtitle">Manage Your Quiz Questions</p>
+      <div class="header-divider"></div>
+    </header>
+    
+    <div class="action-bar">
+      <div>
+        <a href="index.html" class="btn">← Back to Categories</a>
+        <a href="quiz.html" class="btn">Take Local Quiz</a>
+      </div>      <div>
+        <button class="btn btn-success" onclick="openAddModal()">+ Add Questions</button>
+        <button class="btn btn-danger" onclick="clearAllQuestions()">Clear All</button>
+        <button class="btn btn-secondary" onclick="debugLocalStorage()" title="Debug localStorage content">🔍 Debug</button>
+      </div>
+    </div>
+    
+    <div class="quiz-list" id="quiz-list">
+      <!-- Quiz items will be dynamically loaded here -->
+    </div>
+  </div>
+  
+  <!-- Add/Edit Modal -->
+  <div id="question-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add Questions</h2>
+        <span class="close" onclick="closeModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="question-name">Question Set Name:</label>
+          <input type="text" id="question-name" class="form-input" placeholder="e.g., JavaScript Basics, Python Arrays, etc.">
+        </div>        <div class="form-group">
+          <label class="form-label" for="question-content">Questions (JavaScript or JSON Format):</label>
+          <textarea id="question-content" class="form-textarea" placeholder="Paste your question content here...
+
+Supports both JSON and JavaScript formats:
+
+JSON Format:
+[
+  {
+    &quot;question&quot;: &quot;What is the capital of France?&quot;,
+    &quot;code&quot;: &quot;&quot;,
+    &quot;choices&quot;: [
+      &quot;London&quot;,
+      &quot;Berlin&quot;,
+      &quot;Paris&quot;,
+      &quot;Madrid&quot;
+    ],
+    &quot;correct&quot;: 2,
+    &quot;justification&quot;: &quot;Paris is the capital and largest city of France.&quot;
+  }
+]
+
+JavaScript Format (from .js files):
+[
+  {
+    question: 'What is the capital of France?',
+    code: '',
+    choices: [
+      'London',
+      'Berlin', 
+      'Paris',
+      'Madrid'
+    ],
+    correct: 2,
+    justification: 'Paris is the capital and largest city of France.'
+  }
+]
+
+You can also paste content from .js files with 'export default' - it will be automatically processed."></textarea>
+          <div class="error-message" id="content-error"></div>
+          <small style="color: #666; font-size: 0.8rem; margin-top: 5px; display: block;">
+            💡 Tip: You can copy content directly from .js question files - both quoted and unquoted property names are supported!
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-success" onclick="saveQuestions()">Save Questions</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- View Modal -->
+  <div id="view-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="view-modal-title">View Questions</h2>
+        <span class="close" onclick="closeViewModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <pre id="view-content" style="background-color: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeViewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script>
+    let currentEditIndex = null;
+    
+    // Debug function to inspect localStorage
+    function debugLocalStorage() {
+      console.log('=== LocalStorage Debug ===');
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('q')).sort();
+      console.log('Quiz keys found:', keys);
+      
+      keys.forEach(key => {
+        const data = localStorage.getItem(key);
+        console.log(`\n${key}:`, data);
+        try {
+          const parsed = JSON.parse(data);
+          console.log(`${key} parsed:`, parsed);
+          console.log(`${key} is array:`, Array.isArray(parsed));
+          if (parsed && typeof parsed === 'object' && parsed.questions) {
+            console.log(`${key} questions is array:`, Array.isArray(parsed.questions));
+          }
+        } catch (e) {
+          console.log(`${key} parse error:`, e.message);
+        }
+      });
+      console.log('=== End Debug ===');
+    }
+      // Load and display all questions from local storage
+    function loadQuestionsList() {
+      const container = document.getElementById('quiz-list');
+      container.innerHTML = '';
+      
+      const questions = getAllQuestionsFromStorage();
+      
+      // Debug logging
+      console.log('Loaded questions from localStorage:', questions);
+      
+      if (questions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <h3>No Questions Found</h3>
+            <p>You haven't added any questions yet. Click "Add Questions" to get started!</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 10px;">
+              Debug: Found ${Object.keys(localStorage).filter(k => k.startsWith('q')).length} localStorage keys starting with 'q'
+            </p>
+          </div>
+        `;
+        return;
+      }
+      
+      questions.forEach((item, index) => {
+        const questionItem = document.createElement('div');
+        questionItem.className = 'quiz-item';
+        
+        // Better validation for questions count
+        let questionsCount = 0;
+        let questionsStatus = 'Invalid format';
+        
+        if (Array.isArray(item.questions)) {
+          questionsCount = item.questions.length;
+          questionsStatus = `${questionsCount} question${questionsCount !== 1 ? 's' : ''}`;
+        } else if (item.questions) {
+          questionsStatus = 'Invalid format (not array)';
+        } else {
+          questionsStatus = 'No questions data';
+        }
+        
+        questionItem.innerHTML = `
+          <div class="quiz-info">
+            <div class="quiz-title">${item.name}</div>
+            <div class="quiz-meta">
+              Key: ${item.key} | ${questionsStatus} | 
+              Added: ${new Date(item.timestamp).toLocaleDateString()}
+            </div>
+          </div>
+          <div class="quiz-actions">
+            <button class="btn btn-small" onclick="viewQuestions(${index})">View</button>
+            <button class="btn btn-small btn-success" onclick="editQuestions(${index})">Edit</button>
+            <button class="btn btn-small btn-danger" onclick="deleteQuestions(${index})">Delete</button>
+          </div>
+        `;
+        
+        container.appendChild(questionItem);
+      });
+    }
+      // Get all questions from local storage
+    function getAllQuestionsFromStorage() {
+      const questions = [];
+      let index = 1;
+      
+      while (true) {
+        const key = `q${index}`;
+        const data = localStorage.getItem(key);
+        
+        if (!data) break;
+        
+        try {          const questionsData = JSON.parse(data);
+          
+          // Handle both old format (direct array) and new format (object with metadata)
+          let actualQuestions, name, timestamp;
+          
+          console.log(`Processing ${key}:`, questionsData);
+          console.log(`Is array:`, Array.isArray(questionsData));
+          console.log(`Has questions property:`, questionsData.questions !== undefined);
+          console.log(`Questions is array:`, Array.isArray(questionsData.questions));
+          
+          if (Array.isArray(questionsData)) {
+            // Old format: direct array of questions
+            console.log(`${key}: Using old format (direct array)`);
+            actualQuestions = questionsData;
+            name = `Question Set ${index}`;
+            timestamp = Date.now();          } else if (questionsData && typeof questionsData === 'object') {
+            // New format: object with name, questions, timestamp
+            if (questionsData.questions && Array.isArray(questionsData.questions)) {
+              console.log(`${key}: Using new format (object with questions array)`);
+              actualQuestions = questionsData.questions;
+              name = questionsData.name || `Question Set ${index}`;
+              timestamp = questionsData.timestamp || Date.now();
+            } else {
+              // Fallback: treat the object as if it might be a direct questions array or single question
+              if (questionsData.question && questionsData.choices) {
+                // Single question object
+                console.log(`${key}: Using single question format`);
+                actualQuestions = [questionsData];
+                name = `Question Set ${index}`;
+                timestamp = Date.now();
+              } else {
+                // Unknown format, skip
+                console.warn(`Unknown object format for key ${key}, missing questions array:`, questionsData);
+                continue;
+              }
+            }
+          } else {
+            console.warn(`Unexpected data format for key ${key}:`, questionsData);
+            continue;
+          }
+          
+          // Ensure we have a valid array
+          if (!Array.isArray(actualQuestions)) {
+            console.warn(`Questions data is not an array for key ${key}:`, actualQuestions);
+            continue;
+          }
+          
+          questions.push({
+            key: key,
+            name: name,
+            questions: actualQuestions,
+            timestamp: timestamp
+          });
+          
+        } catch (e) {
+          console.error(`Error parsing data for key ${key}:`, e);
+        }
+        
+        index++;
+      }
+      
+      return questions;
+    }
+    
+    // Get next available key
+    function getNextAvailableKey() {
+      let index = 1;
+      while (localStorage.getItem(`q${index}`)) {
+        index++;
+      }
+      return `q${index}`;
+    }
+    
+    // Open add modal
+    function openAddModal() {
+      currentEditIndex = null;
+      document.getElementById('modal-title').textContent = 'Add Questions';
+      document.getElementById('question-name').value = '';
+      document.getElementById('question-content').value = '';
+      document.getElementById('content-error').style.display = 'none';
+      document.getElementById('question-modal').style.display = 'block';
+    }
+    
+    // Open edit modal
+    function editQuestions(index) {
+      const questions = getAllQuestionsFromStorage();
+      if (index < questions.length) {
+        currentEditIndex = index;
+        const item = questions[index];
+        
+        document.getElementById('modal-title').textContent = 'Edit Questions';
+        document.getElementById('question-name').value = item.name;
+        document.getElementById('question-content').value = JSON.stringify(item.questions, null, 2);
+        document.getElementById('content-error').style.display = 'none';
+        document.getElementById('question-modal').style.display = 'block';
+      }
+    }
+    
+    // View questions
+    function viewQuestions(index) {
+      const questions = getAllQuestionsFromStorage();
+      if (index < questions.length) {
+        const item = questions[index];
+        
+        document.getElementById('view-modal-title').textContent = `View: ${item.name}`;
+        document.getElementById('view-content').textContent = JSON.stringify(item.questions, null, 2);
+        document.getElementById('view-modal').style.display = 'block';
+      }
+    }
+    
+    // Close modals
+    function closeModal() {
+      document.getElementById('question-modal').style.display = 'none';
+    }
+    
+    function closeViewModal() {
+      document.getElementById('view-modal').style.display = 'none';
+    }
+    
+    // Save questions
+    function saveQuestions() {
+      const name = document.getElementById('question-name').value.trim();
+      const content = document.getElementById('question-content').value.trim();
+      const errorDiv = document.getElementById('content-error');
+      
+      errorDiv.style.display = 'none';
+      
+      if (!name) {
+        errorDiv.textContent = 'Please enter a name for this question set.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+      
+      if (!content) {
+        errorDiv.textContent = 'Please enter question content.';
+        errorDiv.style.display = 'block';
+        return;
+      }
+        try {
+        // Parse the content - handle both JSON and JavaScript object formats
+        let questions;
+        
+        // First, try to parse as JSON
+        try {
+          questions = JSON.parse(content);
+        } catch (jsonError) {
+          // If JSON parsing fails, try to convert JS object format to JSON
+          let processedContent = content.trim();
+          
+          // Remove 'export default' if present
+          processedContent = processedContent.replace(/^export\s+default\s+/, '');
+          
+          // Convert unquoted property names to quoted (JS object to JSON format)
+          processedContent = processedContent.replace(/(\w+):/g, '"$1":');
+          
+          // Handle single quotes to double quotes
+          processedContent = processedContent.replace(/'/g, '"');
+          
+          // Try parsing the converted content
+          try {
+            questions = JSON.parse(processedContent);
+          } catch (convertedJsonError) {
+            // If still failing, try eval as last resort (for complex JS)
+            try {
+              questions = eval(`(${content})`);
+            } catch (evalError) {
+              throw new Error(`Invalid format. Please use valid JSON or JavaScript object format. JSON Error: ${jsonError.message}`);
+            }
+          }
+        }
+          // Ensure it's an array
+        if (!Array.isArray(questions)) {
+          if (questions && typeof questions === 'object') {
+            // If it's a single question object, wrap it in an array
+            questions = [questions];
+          } else {
+            throw new Error('Questions must be an array or a single question object.');
+          }
+        }
+        
+        // Ensure we have at least one question
+        if (questions.length === 0) {
+          throw new Error('At least one question is required.');
+        }
+        
+        // Validate question structure
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i];
+          if (!q || typeof q !== 'object') {
+            throw new Error(`Invalid question object at index ${i}.`);
+          }
+          if (!q.question || typeof q.question !== 'string') {
+            throw new Error(`Invalid or missing question text at index ${i}.`);
+          }
+          if (!Array.isArray(q.choices) || q.choices.length === 0) {
+            throw new Error(`Invalid or missing choices array at index ${i}. Each question must have an array of choices.`);
+          }
+          if (typeof q.correct !== 'number' || q.correct < 0 || q.correct >= q.choices.length) {
+            throw new Error(`Invalid correct answer index at index ${i}. Must be a number between 0 and ${q.choices.length - 1}.`);
+          }
+          if (!q.justification || typeof q.justification !== 'string') {
+            throw new Error(`Missing or invalid justification at index ${i}.`);
+          }
+        }
+        
+        // Prepare data to save
+        const dataToSave = {
+          name: name,
+          questions: questions,
+          timestamp: Date.now()
+        };
+        
+        // Determine the key to save to
+        let key;
+        if (currentEditIndex !== null) {
+          // Editing existing item
+          const existingQuestions = getAllQuestionsFromStorage();
+          key = existingQuestions[currentEditIndex].key;
+        } else {
+          // Adding new item
+          key = getNextAvailableKey();
+        }
+        
+        // Save to localStorage
+        localStorage.setItem(key, JSON.stringify(dataToSave));
+        
+        showNotification(
+          currentEditIndex !== null ? 'Questions updated successfully!' : 'Questions added successfully!',
+          'success'
+        );
+        
+        closeModal();
+        loadQuestionsList();
+        
+      } catch (e) {
+        errorDiv.textContent = `Error parsing questions: ${e.message}`;
+        errorDiv.style.display = 'block';
+      }
+    }
+    
+    // Delete questions
+    function deleteQuestions(index) {
+      const questions = getAllQuestionsFromStorage();
+      if (index < questions.length) {
+        const item = questions[index];
+        
+        if (confirm(`Are you sure you want to delete "${item.name}"? This action cannot be undone.`)) {
+          localStorage.removeItem(item.key);
+          
+          // Reorganize keys to maintain q1, q2, q3... sequence
+          reorganizeKeys();
+          
+          showNotification('Questions deleted successfully!', 'success');
+          loadQuestionsList();
+        }
+      }
+    }
+    
+    // Clear all questions
+    function clearAllQuestions() {
+      if (confirm('Are you sure you want to delete ALL questions? This action cannot be undone.')) {
+        const questions = getAllQuestionsFromStorage();
+        questions.forEach(item => localStorage.removeItem(item.key));
+        
+        showNotification('All questions cleared!', 'success');
+        loadQuestionsList();
+      }
+    }
+    
+    // Reorganize keys to maintain sequence
+    function reorganizeKeys() {
+      const questions = getAllQuestionsFromStorage();
+      
+      // Clear all existing keys
+      questions.forEach(item => localStorage.removeItem(item.key));
+      
+      // Re-save with sequential keys
+      questions.forEach((item, index) => {
+        const newKey = `q${index + 1}`;
+        const data = {
+          name: item.name,
+          questions: item.questions,
+          timestamp: item.timestamp
+        };
+        localStorage.setItem(newKey, JSON.stringify(data));
+      });    }
+    
+    // Show notification (simplified version)
+    function showNotification(message, type) {
+      console.log(`${type.toUpperCase()}: ${message}`);
+      alert(message);
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('question-modal');
+      const viewModal = document.getElementById('view-modal');
+      
+      if (event.target === modal) {
+        closeModal();
+      }
+      if (event.target === viewModal) {
+        closeViewModal();
+      }
+    }
+      // Initialize page
+    window.addEventListener('DOMContentLoaded', function() {
+      debugLocalStorage();
+      loadQuestionsList();
+    });
+  </script>
+</body>
+</html>
