@@ -142,8 +142,7 @@
     .section-title p {
       color: #666;
     }
-    
-    .folder-path {
+      .folder-path {
       font-family: monospace;
       background-color: #f0f0f0;
       padding: 2px 5px;
@@ -151,6 +150,69 @@
       font-size: 0.8rem;
       color: #555;
       margin-top: 8px;
+    }
+    
+    .search-container {
+      max-width: 500px;
+      margin: 0 auto 30px auto;
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #4a6eb5;
+      box-shadow: 0 0 0 3px rgba(74, 110, 181, 0.1);
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: 1.2rem;
+    }
+    
+    .clear-search {
+      position: absolute;
+      right: 45px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px;
+      display: none;
+    }
+    
+    .clear-search:hover {
+      color: #666;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 1.1rem;
+      display: none;
+    }
+    
+    .no-results-icon {
+      font-size: 3rem;
+      color: #ddd;
+      margin-bottom: 15px;
     }
     
     footer {
@@ -185,10 +247,27 @@
       </div>
       <div class="header-divider"></div>
     </header>
-    
-    <div class="section-title">
+      <div class="section-title">
       <h2>Quiz Categories</h2>
       <p>Select a category to begin your quiz session</p>
+    </div>
+    
+    <div class="search-container">
+      <input 
+        type="text" 
+        id="category-search" 
+        class="search-input" 
+        placeholder="Search categories by name, subject, or semester..."
+        autocomplete="off"
+      >
+      <button type="button" id="clear-search" class="clear-search" title="Clear search">✕</button>
+      <span class="search-icon">🔍</span>
+    </div>
+    
+    <div class="no-results" id="no-results">
+      <div class="no-results-icon">📋</div>
+      <p>No categories match your search criteria.</p>
+      <small>Try searching for different keywords or clear the search to see all categories.</small>
     </div>
     
     <div class="card-container" id="categories-container">
@@ -237,14 +316,25 @@
         folder: 'categories/os'
       }
     ];
-    
-    // Function to create quiz category cards
-    function createCategoryCards() {
+      // Function to create quiz category cards
+    function createCategoryCards(categoriesToShow = quizCategories) {
       const container = document.getElementById('categories-container');
+      const noResults = document.getElementById('no-results');
       
-      quizCategories.forEach(category => {
+      // Clear existing cards
+      container.innerHTML = '';
+      
+      if (categoriesToShow.length === 0) {
+        noResults.style.display = 'block';
+        return;
+      } else {
+        noResults.style.display = 'none';
+      }
+      
+      categoriesToShow.forEach(category => {
         const card = document.createElement('div');
-        card.className = 'card';        card.onclick = () => {
+        card.className = 'card';
+        card.onclick = () => {
           // Store category information in session storage for the quiz page to use
           sessionStorage.setItem('categoryInfo', JSON.stringify(category));
           
@@ -285,8 +375,95 @@
       });
     }
     
-    // Initialize the page
-    window.addEventListener('DOMContentLoaded', createCategoryCards);
+    // Function to filter categories based on search input
+    function filterCategories(searchTerm) {
+      const term = searchTerm.toLowerCase().trim();
+      
+      if (!term) {
+        return quizCategories;
+      }
+      
+      return quizCategories.filter(category => {
+        // Search in category name
+        const nameMatch = category.name.toLowerCase().includes(term);
+        
+        // Search in subject name and code
+        const subjectNameMatch = category.subject.name.toLowerCase().includes(term);
+        const subjectCodeMatch = category.subject.code.toLowerCase().includes(term);
+        
+        // Search in semester
+        const semesterMatch = category.semester.toLowerCase().includes(term);
+        
+        // Search in category ID
+        const idMatch = category.id.toLowerCase().includes(term);
+        
+        return nameMatch || subjectNameMatch || subjectCodeMatch || semesterMatch || idMatch;
+      });
+    }
+    
+    // Function to handle search input
+    function handleSearch() {
+      const searchInput = document.getElementById('category-search');
+      const clearButton = document.getElementById('clear-search');
+      const searchTerm = searchInput.value;
+      
+      // Show/hide clear button
+      if (searchTerm) {
+        clearButton.style.display = 'block';
+      } else {
+        clearButton.style.display = 'none';
+      }
+      
+      // Filter and display categories
+      const filteredCategories = filterCategories(searchTerm);
+      createCategoryCards(filteredCategories);
+    }
+    
+    // Function to clear search
+    function clearSearch() {
+      const searchInput = document.getElementById('category-search');
+      const clearButton = document.getElementById('clear-search');
+      
+      searchInput.value = '';
+      clearButton.style.display = 'none';
+      createCategoryCards(quizCategories);
+      searchInput.focus();
+    }
+    
+    // Initialize the page and set up event listeners
+    window.addEventListener('DOMContentLoaded', function() {
+      // Create initial category cards
+      createCategoryCards();
+      
+      // Set up search functionality
+      const searchInput = document.getElementById('category-search');
+      const clearButton = document.getElementById('clear-search');
+      
+      // Search as user types (with debouncing)
+      let searchTimeout;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(handleSearch, 200);
+      });
+      
+      // Handle Enter key
+      searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          clearTimeout(searchTimeout);
+          handleSearch();
+        }
+      });
+      
+      // Clear search button
+      clearButton.addEventListener('click', clearSearch);
+      
+      // Clear search with Escape key
+      searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          clearSearch();
+        }
+      });
+    });
   </script>
 </body>
 </html>

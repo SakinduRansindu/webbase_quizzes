@@ -1,5 +1,5 @@
 
-rt default [
+export default [
   {
     question: "Which of the following is a key difference between linear and non-linear data structures?",
     code: "",
