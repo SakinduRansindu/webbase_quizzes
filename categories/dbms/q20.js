@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Deadlock detection allows deadlocks to occur before resolving them, which can impact performance[1]."
   }
-]
+];

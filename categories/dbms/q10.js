@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "The data dictionary stores information about tables, attributes, and other metadata."
   }
-]
+];

@@ -119,4 +119,4 @@ export default [
     correct: 1,
     justification: "Bitmap indices become large and inefficient for attributes with many distinct values."
   }
-]
+];

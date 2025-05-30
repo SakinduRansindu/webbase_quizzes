@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "The buffer manager allocates main memory for disk blocks and manages their access[1]."
   }
-]
+];

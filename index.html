@@ -338,44 +338,9 @@
       <p>Quiz Zone &copy; 2025 | Educational purpose only</p>
     </footer>
   </div>
-  
+    <script src="js/utils.js"></script>
+  <script src="js/categories.js"></script>
   <script>
-    // Quiz category data
-    const quizCategories = [
-      {
-        id: 'dbms',
-        name: 'Database Management Systems',
-        semester: '4th Semester',
-        subject: {
-          name: 'DBMS',
-          code: 'IN2401'
-        },
-        quizCount: 25,
-        folder: 'categories/dbms'
-      },
-      {
-        id: 'dsa',
-        name: 'Data Structures and Algorithms',
-        semester: '4rd Semester',
-        subject: {
-          name: 'DSA2',
-          code: 'IN2111'
-        },
-        quizCount: 5,
-        folder: 'categories/dsa'
-      },
-      {
-        id: 'os',
-        name: 'Operating Systems',
-        semester: '4th Semester',
-        subject: {
-          name: 'OS',
-          code: 'CS302'
-        },
-        quizCount: 5,
-        folder: 'categories/os'
-      }
-    ];
       // Function to create quiz category cards
     function createCategoryCards(categoriesToShow = quizCategories) {
       const container = document.getElementById('categories-container');

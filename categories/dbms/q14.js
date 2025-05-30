@@ -119,4 +119,4 @@ export default [
     correct: 2,
     justification: "Triggers can perform complex actions, while constraints enforce simple data integrity rules[1]."
   }
-]
+];

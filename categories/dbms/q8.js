@@ -119,4 +119,4 @@ export default [
     correct: 2,
     justification: "B+-tree indices are preferred for range queries due to their ordered structure."
   }
-]
+];

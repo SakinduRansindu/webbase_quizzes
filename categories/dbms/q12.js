@@ -119,4 +119,4 @@ export default [
     correct: 1,
     justification: "Too many indices increase maintenance overhead during data modifications."
   }
-]
+];

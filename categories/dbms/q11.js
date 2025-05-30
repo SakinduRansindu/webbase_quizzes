@@ -119,4 +119,4 @@ export default [
     correct: 1,
     justification: "Fragmentation increases disk arm movement, slowing down sequential access."
   }
-]
+];

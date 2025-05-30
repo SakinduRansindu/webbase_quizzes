@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Starvation occurs when a transaction is repeatedly rolled back and never completes[1]."
   }
-]
+];

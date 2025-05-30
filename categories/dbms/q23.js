@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Extended-relational databases support concurrency, recovery, and complex types[1]."
   }
-]
+];

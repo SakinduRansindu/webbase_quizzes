@@ -119,4 +119,4 @@ export default [
     correct: 1,
     justification: "A class is a user-defined type with attributes and operations in OODBMS[1]."
   }
-]
+];

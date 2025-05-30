@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Dynamic programming helps find the optimal join order among many possible join sequences."
   }
-]
+];

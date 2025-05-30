@@ -119,4 +119,4 @@ export default [
     correct: 3,
     justification: "Distribution is not one of the ACID properties; the correct properties are Atomicity, Consistency, Isolation, and Durability[1]."
   }
-]
+];

@@ -119,4 +119,4 @@ export default [
     correct: 1,
     justification: "Serializability order is determined by the time transactions enter the validation phase[1]."
   }
-]
+];

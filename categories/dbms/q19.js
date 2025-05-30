@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Lock granularity refers to the size of the data item being locked, such as database, file, or record[1]."
   }
-]
+];

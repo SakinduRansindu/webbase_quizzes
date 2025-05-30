@@ -119,4 +119,4 @@ export default [
     correct: 1,
     justification: "Cartesian products can generate large intermediate results, increasing I/O and reducing performance[1]."
   }
-]
+];

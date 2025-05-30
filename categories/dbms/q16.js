@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Embedded SQL allows programs to generate queries dynamically based on user input[1]."
   }
-]
+];

@@ -119,4 +119,4 @@ export default [
     correct: 0,
     justification: "Secondary indices require additional storage and maintenance."
   }
-]
+];

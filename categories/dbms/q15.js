@@ -119,4 +119,4 @@ export default [
     correct: 3,
     justification: "Views do not automatically optimize performance; they provide abstraction and security[1]."
   }
-]
+];
