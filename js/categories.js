@@ -35,5 +35,13 @@ const quizCategories = [
     subject: { name: 'OS', code: 'IN12' },
     quizCount: 10,
     folder: 'categories/os'
-  }
+  },
+  {
+    id: 'graphics',
+    name: 'Computer Graphics',
+    semester: '4th Semester',
+    subject: { name: 'Computer Graphics', code: 'IN2601' },
+    quizCount: 15,
+    folder: 'categories/graphics'
+  },
 ];
