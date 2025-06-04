@@ -44,4 +44,12 @@ const quizCategories = [
     quizCount: 15,
     folder: 'categories/graphics'
   },
+  {
+    id: 'nutrition',
+    name: 'Nutrition - Carbohydrate',
+    semester: '4th Semester',
+    subject: { name: 'NUTRITION', code: 'DI1018' },
+    quizCount: 100,
+    folder: 'categories/nutrition'
+  },
 ];
