@@ -52,4 +52,12 @@ const quizCategories = [
     quizCount: 100,
     folder: 'categories/nutrition'
   },
+  {
+    id: 'econ',
+    name: 'Econ - Elasticity',
+    semester: '4th Semester',
+    subject: { name: 'ECON - ELASTICITY', code: 'IS2211' },
+    quizCount: 41,
+    folder: 'categories/econ'
+  }
 ];
