@@ -59,5 +59,13 @@ const quizCategories = [
     subject: { name: 'ECON - ELASTICITY', code: 'IS2211' },
     quizCount: 41,
     folder: 'categories/econ'
+  },
+  {
+    id: 'nutrition2',
+    name: 'Nutrition - Importance',
+    semester: '4th Semester',
+    subject: { name: 'NUTRITION', code: 'DI1018' },
+    quizCount: 50,
+    folder: 'categories/nutrition2'
   }
 ];
