@@ -67,5 +67,21 @@ const quizCategories = [
     subject: { name: 'NUTRITION', code: 'DI1018' },
     quizCount: 50,
     folder: 'categories/nutrition2'
+  },
+  {
+    id: 'nutrition3',
+    name: 'Nutrition - diet plans',
+    semester: '5th Semester',
+    subject: { name: 'NUTRITION', code: 'DI1018' },
+    quizCount: 33,
+    folder: 'categories/nutrition3'
+  },
+  {
+    id: 'nutrition4',
+    name: 'Nutrition - food nutritions',
+    semester: '4th Semester',
+    subject: { name: 'NUTRITION', code: 'DI1018' },
+    quizCount: 71,
+    folder: 'categories/nutrition4'
   }
 ];
